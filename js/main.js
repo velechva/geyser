@@ -4,7 +4,12 @@ let Geyser,
 
 let userTokenBalance,
     totalStakedFor,
-    totalDeposits
+    totalDeposits,
+    totalLocked,
+    totalUnlocked,
+    tokenDecimals,
+    tokenApproved = false,
+    tokenAllowance;
 
 $(document).ready(function() {
     
@@ -36,6 +41,11 @@ $(document).ready(function() {
         }
     })
     
+    // Approve button 
+    $("#b_APPROVE").on("click", function() {
+        approve()
+    })
+    
 })
 
 // Handle menu tabs 
@@ -49,12 +59,37 @@ function openPage(tab) {
 async function setup() {
     Geyser = new web3.eth.Contract(abi, GeyserAddress)
     Token = new web3.eth.Contract(token_abi, TokenAddress)
+    
+    $("#btn-connect").text("Connected!")
+    $("#btn-connect").attr("disabled", true)
 }
 
 // Load data 
 async function load() {
-
+    $(".error").hide()
     try {
+        if(!tokenApproved) {
+            await Token.methods.allowance(GeyserAddress, accounts[0]).call().then(function(r) {
+                if(r !== tokenAllowance) {
+                    tokenAllowance = r
+                    if( parseFloat(web3.utils.fromWei(r)) > 0 ) {
+                        tokenApproved = true
+                    } else {
+                        $("#b_APPROVE").removeClass("hidden")
+                        $("#b_APPROVE").removeClass("disabled")
+                    }
+                }
+            })
+        } else {
+            if(!$("#b_APPROVE").hasClass("disabled")) {
+                $("#b_APPROVE").addClass("disabled")
+                $("#b_APPROVE").addClass("hidden")
+            }
+        }
+        
+        await Token.methods.decimals().call().then(function(r){
+           tokenDecimals = parseInt(r)
+        })
         
         // BalanceOf 
         await Token.methods.balanceOf(accounts[0]).call().then(function(r) {
@@ -92,12 +127,59 @@ async function load() {
                 refresh($("#s_TOTALDEPOSITS"), totalDeposits) // Total deposits field
             }
         })
+
+         // totalUnlocked
+         await Geyser.methods.totalUnlocked().call().then(function(r) {
+            if(r !== totalUnlocked) {
+                totalUnlocked = r
+                refresh($("#s_UNLOCKEDREWARDS"), totalUnlocked) // Total deposits field
+            }
+        })
+
+        
+         // totalLocked
+        await Geyser.methods.totalLocked().call().then(function(r) {
+            if(r !== totalLocked) {
+                totalLocked = r
+                refresh($("#s_LOCKEDREWARDS"), totalLocked) // Total deposits field
+            }
+        })
+
+        // program duration
+        await Geyser.methods.unlockScheduleCount().call().then(function(count) {
+            Geyser.methods.unlockSchedules(count-1).call().then(function(info) {
+                let endTimestamp=parseInt(info.endAtSec)
+                let currentTimestamp=Math.ceil(Date.now()/1000)
+                let secsRemaining=endTimestamp-currentTimestamp
+                let daysRemaining = parseInt(secsRemaining/(60*60*24));
+                refreshNoConvert($("#s_DURATION"), daysRemaining) // Total depos
+            })
+        })
     }
     
     catch(e) {
         console.error(e)
     }
 
+}
+
+// Approve token for trading 
+async function approve() {
+    try {
+        await Token.methods.approve(GeyserAddress, web3.utils.toWei("1000000000")).send({
+            from: accounts[0]
+        })
+        .on("transactionHash", function(hash) {
+            info("pendingApprove")
+        })
+        .on("receipt", function(receipt) {
+            info("approveComplete")
+            setTimeout(function(){ load() }, 1000);
+        })
+    }
+    catch(e) {
+        console.error(e)
+    }
 }
 
 // Deposit / Stake 
@@ -113,7 +195,7 @@ async function deposit() {
         })
         .on("receipt", function(receipt) {
             info("depositComplete")
-            load() // reload
+            setTimeout(function(){ load() }, 1000);
         })
     }
     
@@ -136,7 +218,7 @@ async function withdraw() {
         })
         .on("receipt", function(receipt) {
             info("withdrawComplete")
-            load() // reload
+            setTimeout(function(){ load() }, 1000);
         })
     }
     
@@ -162,30 +244,43 @@ function info(i) {
     switch(i) {
         case "pendingDeposit":
             $(".e_MESSAGE").text("Pending deposit...")
-        break;
+            break;
         case "depositComplete":
             $(".e_MESSAGE").text("Deposit completed!")
-        break;
+            break;
         case "pendingWithdraw":
             $(".e_MESSAGE").text("Pending withdraw...")
-        break;
+            break;
         case "withdrawComplete":
             $(".e_MESSAGE").text("Withdraw complete!")
-        break;
+            break;
+        case "pendingApprove":
+            $(".e_MESSAGE").text("Pending approve...")
+            break;
+        case "approveComplete":
+            $(".e_MESSAGE").text("Approve complete!")
+            break;
     }
 }
 
 // Update UI with new values 
+
+function refreshNoConvert(element, newval) {
+    $(element).fadeOut();
+    $(element).text(newval);
+    $(element).fadeIn();
+}
 function refresh(element, newval) {
     $(element).fadeOut();
-    $(element).text(decimal(web3.utils.fromWei(newval)));
+    let value=parseInt(newval)/parseFloat(10**tokenDecimals);
+    $(element).text(decimal(value));
     $(element).fadeIn();
 }
 
 // Truncates decimal places without rounding
 function decimal(number) {
     // Truncate to 4 decimal places 
-    return number.match(/^-?\d+(?:\.\d{0,4})?/)[0];
+    return number.toString().match(/^-?\d+(?:\.\d{0,4})?/)[0];
 }
 
 // Simple input validation
