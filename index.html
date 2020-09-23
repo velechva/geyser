@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/main.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
     </head>
     <body class="full-width full-height">
         
@@ -87,6 +88,9 @@
                                 <div class="margin-left-2px">(1UPWETH-V2)</div>
                             </div>
                             <input id="v_DEPOSITAMT" class="input" type="number" placeholder="Enter amount" min="0" step="0.01" value="">
+                            <div id="b_APPROVE" class="flex-box margin-top-2rem align-items-center justify-center button disabled hidden">
+                                <span>Unlock token</span>
+                            </div>
                         </div>
                         
                         <div class="flex-box full-width margin-top-2rem no-overflow border-radius-4px align-items-center shadow padding-1rem">
@@ -168,7 +172,7 @@
                         <div class="statcol flex-box col">
                             <div class="statrow flex-box col justify-center shadow padding-1rem">
                                 <div><span>Total deposits</span></div>
-                                <div class="font-weight-bold"><span id="s_TOTALDEPOSITS">0,000,000</span><span> USD</span></div>
+                                <div class="font-weight-bold"><span id="s_TOTALDEPOSITS">0,000,000</span><span> WETH-1UP</span></div>
                             </div>
                             <div class="statrow flex-box col justify-center shadow padding-1rem">
                                 <div><span>Unlocked rewards</span></div>
