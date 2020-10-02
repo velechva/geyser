@@ -1,0 +1,163 @@
+*                   {margin: 0; padding: 0; box-sizing: border-box}
+.full-width         {width: 100%}
+.full-height        {height: 100%}
+
+.no-overflow        {overflow: none}
+.no-pointer-events  {cursor: pointer; pointer-events: none}
+
+.flex-box           {display: flex}
+.space-between      {justify-content: space-between}
+.space-evenly       {justify-content: space-evenly}
+.justify-center     {justify-content: center}
+.align-items-center {align-items: center}
+.flex-end           {justify-content: flex-end}
+
+.col                {flex-direction: column}
+
+.height-50px        {height: 50px}
+.max-width-650px    {width: 100%; max-width: 650px}
+
+.padding-1rem       {padding: 1rem}
+.margin-top-10px    {margin-top: 10px}
+.margin-left-2px    {margin-left: 2px}
+.margin-right-10px  {margin-right: 10px}
+.margin-top-2rem    {margin-top: 2rem}
+
+.font-weight-bold   {font-weight: bold}
+.font-size-80p      {font-size: 80%}
+
+.border-radius-4px  {border-radius: 4px}
+
+#c_WITHDRAW,
+#c_STATS,
+.hidden {
+    display: none;
+}
+
+.error {
+    background: #FFA200;
+    color: #fff;
+    border-left: 8px solid #FD5804;
+    display: none;
+    padding: 20px;
+    margin: 15px 0px;
+    margin-bottom: 5px;
+    min-height: 30px;
+}
+
+.shadow {
+    -webkit-box-shadow: 0px -2px 25px -3px rgba(0, 0, 0, 0.1) !important;
+    -moz-box-shadow: 0px -2px 25px -3px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0px -2px 25px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.tooltip {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.icon {
+    width: 100px;
+    height: 100px;
+    background: url(../img/Uptrennd_Logo.webp) no-repeat;
+    background-size: contain;
+}
+
+.tabs {
+    color: #ffffff;
+    border: 0px solid #efefef;
+    display: flex;
+    overflow: hidden;
+    background: #274EEE;
+    height: 45px;
+    width: calc(100% - 10px);
+    border-radius: 10px;
+    margin-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.content {
+    width: calc(100% - 10px);
+}
+
+.tab {
+    width: 33.333333%;
+    cursor: pointer;
+}
+
+.tab-selected {
+    color: #000000;
+    border: 1.5px solid #274EEE;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.b1 {
+    margin: 5px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    width: 33.333333%;
+    padding: 10px 15px;
+    margin-top: 0px;
+    background: #f8f8f8;
+    color: #000;
+}
+
+.w_element {
+    width: 50%;
+    min-height: 68px;
+    border-radius: 3px;
+    padding: 20px 20px;
+    margin-top: 0px;
+    background: #fff;
+    color: #000;
+}
+
+.statcol {
+    width: 50%;
+}
+
+.statrow {
+    min-height: 90px;
+    margin: 10px;
+}
+
+
+
+.button {
+    text-transform: uppercase;
+    height: 70px;
+    font-size: 15px;
+    border-radius: 8px;
+    color: white;
+    background: #2096F3;
+    cursor: pointer;
+}
+
+.disabled {
+    color: rgba(0, 0, 0, 0.26);
+    background-color: rgba(0, 0, 0, 0.12);
+    cursor: default;
+    pointer-events: none;
+}
+
+.input {
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 60px;
+    font-size: 20px;
+    background: #fff;
+    color: #000;
+    box-sizing: border-box !important;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: "Lucida Console", Courier, monospace;
+    margin: 0px;
+    text-indent: 10px;
+    font-weight: bold;
+    padding: 12px 10px;
+}

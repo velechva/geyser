@@ -1,0 +1,202 @@
+<!doctype html>
+<html class="full-width full-height">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="css/main.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <body class="full-width full-height">
+        
+        <div class="nav flex-box space-between align-items-center height-50px padding-1rem">
+            <div>Uptrennd Geyser</div>
+            <div><button id="btn-connect">Connect</button></div>
+        </div>
+        
+        <div class="flex-box justify-center">
+            
+            <div class="main flex-box col align-items-center max-width-650px padding-1rem shadow">
+                
+                <div class="flex-box row full-width space-evenly margin-top-10px">
+                    
+                    <div class="b1 flex-box col">
+                        <div class="flex-box space-between">
+                            <div class="label">APY</div>
+                            <div id="i_APY"><svg class="tooltip" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg></div>
+                        </div>
+                        <div class="value">
+                            <span id="v_APY" class="font-weight-bold"></span>
+                            <span class="font-weight-bold">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="b1 flex-box col">
+                        <div class="flex-box space-between">
+                            <div class="label">Reward multiplier</div>
+                            <div id="i_MULTIPLIER"><svg class="tooltip" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg></div>
+                        </div>
+                        <div class="value">
+                            <span id="v_MULTIPLIER" class="font-weight-bold">1.0</span>
+                            <span class="font-weight-bold">x</span>
+                        </div>
+                    </div>
+                    
+                    <div class="b1 flex-box col">
+                        <div class="flex-box space-between">
+                            <div class="label">Accrued Rewards</div>
+                            <div id="i_REWARDS"><svg class="tooltip" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg></div>
+                        </div>
+                        <div class="value">
+                            <span id="v_REWARDS" class="font-weight-bold">0.0000</span>
+                            <span class="font-weight-bold">1UP</span>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+                
+                
+                <div id="Menu" class="tabs margin-top-10px">
+                    
+                    <div class="flex-box align-items-center justify-center tab tab-selected" data="c_DEPOSIT">
+                        <span class="no-pointer-events">Deposit</span>
+                    </div>
+                    
+                    <div class="flex-box align-items-center justify-center tab" data="c_WITHDRAW">
+                        <span class="no-pointer-events">Withdraw</span>
+                    </div>
+                    
+                    <div class="flex-box align-items-center justify-center tab" data="c_STATS">
+                        <span class="no-pointer-events">Stats</span>
+                    </div>
+                    
+                </div>
+                
+                
+                
+                
+                <div class="flex-box col align-items-center content margin-top-10px">
+                    
+                    <div id="c_DEPOSIT" class="page full-width col">
+                        
+                        <div class="flex-box col full-width">
+                            <div class="label flex-box flex-end font-size-80p">
+                                <div>Wallet balance: </div>
+                                <div id="v_WALLETBALANCE">0.0000</div>
+                                <div class="margin-left-2px">(1UPWETH-V2)</div>
+                            </div>
+                            <input id="v_DEPOSITAMT" class="input" type="number" placeholder="Enter amount" min="0" step="0.01" value="">
+                        </div>
+                        
+                        <div class="flex-box full-width margin-top-2rem no-overflow border-radius-4px align-items-center shadow padding-1rem">
+                            <div class="icon margin-right-10px"></div>
+                            <div class="flex-box col">
+                                <div class="flex-box space-between">
+                                    <div class="label">Your estimated rewards</div>
+                                    <div id="i_ESTREWARDS"><svg class="tooltip margin-left-2px" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg></div>
+                                </div>
+                                <div class="font-weight-bold"><span id="v_ESTREWARDS">0.0000</span><span> 1UP / month</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="error flex-box col margin-top-2rem align-items-center justify-center">
+                            <p class="e_MESSAGE"></p>
+                        </div>
+                        
+                        <div id="b_DEPOSIT" class="flex-box margin-top-2rem align-items-center justify-center button disabled">
+                            <span>Deposit</span>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                    <div id="c_WITHDRAW" class="page full-width col">
+                        
+                        <div class="flex-box col full-width">
+                            <div class="label flex-box flex-end font-size-80p">
+                                <div>Deposited: </div>
+                                <div id="v_DEPOSITEDAMT">0.0000</div>
+                                <div class="margin-left-2px">(1UPWETH-V2)</div>
+                            </div>
+                            <input id="v_WITHDRAWAMT" class="input" type="number" placeholder="Enter amount" min="0" step="0.01" value="">
+                        </div>
+                        
+                        <div class="flex-box full-width margin-top-2rem no-overflow border-radius-4px align-items-center padding-1rem">
+                            <div class="flex-box full-width space-evenly">
+                                <div class="w_element flex-box col shadow justify-center margin-right-10px">
+                                    <div><span>Amount to withdraw:</span></div>
+                                    <div class="font-weight-bold"><span id="w_AMTWITHDRAW">0.0000</span> $1UPWETH-V2</div>
+                                </div>
+                                <div class="w_element flex-box col shadow justify-center">
+                                    <div><span>Rewards claimed:</span></div>
+                                    <div class="font-weight-bold"><span id="w_AMTCLAIMED">0.0000</span> 1UP</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="error flex-box col margin-top-2rem align-items-center justify-center">
+                            <p class="e_MESSAGE"></p>
+                        </div>
+                        
+                        <div id="b_WITHDRAW" class="flex-box margin-top-2rem align-items-center justify-center button disabled">
+                            <span>Withdraw</span>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    <div id="c_STATS" class="page full-width flex-box margin-top-10px">
+                        
+                        <div class="statcol flex-box col">
+                            <div class="statrow flex-box col justify-center shadow padding-1rem">
+                                <div><span>Total rewards</span></div>
+                                <div class="font-weight-bold"><span id="s_TOTALREWARDS">0.0000</span><span> 1UP</span></div>
+                            </div>
+                            <div class="statrow flex-box col justify-center shadow padding-1rem">
+                                <div><span>Locked rewards</span></div>
+                                <div class="font-weight-bold"><span id="s_LOCKEDREWARDS">0.0000</span><span> 1UP</span></div>
+                            </div>
+                            <div class="statrow flex-box col justify-center shadow padding-1rem">
+                                <div><span>Program duration</span></div>
+                                <div class="font-weight-bold"><span id="s_DURATION">0</span><span> days left</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="statcol flex-box col">
+                            <div class="statrow flex-box col justify-center shadow padding-1rem">
+                                <div><span>Total deposits</span></div>
+                                <div class="font-weight-bold"><span id="s_TOTALDEPOSITS">0,000,000</span><span> USD</span></div>
+                            </div>
+                            <div class="statrow flex-box col justify-center shadow padding-1rem">
+                                <div><span>Unlocked rewards</span></div>
+                                <div class="font-weight-bold"><span id="s_UNLOCKEDREWARDS">0,000,000</span><span> 1UP</span></div>
+                            </div>
+                            <div class="statrow flex-box col justify-center shadow padding-1rem">
+                                <div><span>Reward unlock rate</span></div>
+                                <div class="font-weight-bold"><span id="s_UNLOCKRATE">0,000,000</span><span> 1UP / month</span></div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <script type="text/javascript" src="https://unpkg.com/web3@1.2.11/dist/web3.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/web3modal@1.9.0/dist/index.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/evm-chains/lib/index.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/@walletconnect/web3-provider@1.2.1/dist/umd/index.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/fortmatic@2.0.6/dist/fortmatic.js"></script>
+        <script type="text/javascript" src="js/connect.js"></script>
+        <script type="text/javascript" src="js/abi.js"></script>
+        <script type="text/javascript" src="js/token_abi.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        
+    </body>
+</html>
