@@ -15,11 +15,11 @@ let web3Modal,
 
 function init() {
 
-    if (location.protocol !== 'https:') {
-        console.error("Not using HTTPS protocol...")
-        document.querySelector("#btn-connect").setAttribute("disabled", "disabled")
-        return;
-    }
+    // if (location.protocol !== 'https:') {
+    //     console.error("Not using HTTPS protocol...")
+    //     document.querySelector("#btn-connect").setAttribute("disabled", "disabled")
+    //     return;
+    // }
 
     // Tell Web3modal what providers we have available.
     // Built-in web browser provider (only one can exist as a time)
