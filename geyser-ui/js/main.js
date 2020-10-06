@@ -1,6 +1,6 @@
 let Geyser,
     GeyserAddress = "0xDa318eA78e32D8481bbc1916A3C11339b3d927bE",
-    TokenAddress = "0x372e79ac44b5d4f4f60b9a47dc8b3eb32bb5119b"
+    TokenAddress  = "0x372e79ac44b5d4f4f60b9a47dc8b3eb32bb5119b"
 
 let userTokenBalance,
     totalStakedFor,
@@ -10,17 +10,16 @@ let userTokenBalance,
     unlockedBalance,
     totalBalance
 
-
 $(document).ready(function() {
     // Menu clicks
-    $("#Menu").on("click", function(e) {
+    $("#menu").on("click", function(e) {
         let page = $(e.target).attr("data")
-        $(".tab").removeClass("tab-selected")
-        $(e.target).addClass("tab-selected")
+        $("#menu ul li").removeClass("is-active")
+        $(e.target).addClass("is-active")
         openPage(page)
     })
     
-    // Deposit / Stake button 
+    // Deposit / Stake button
     $("#b_DEPOSIT").on("click", function() {
         let inputValue = $("#v_DEPOSITAMT").val()
         if(valid(inputValue)) {
@@ -30,7 +29,7 @@ $(document).ready(function() {
         }
     })
     
-    // Withdraw / Unstake button 
+    // Withdraw / Unstake button
     $("#b_WITHDRAW").on("click", function() {
         let inputValue = $("#v_WITHDRAWAMT").val()
         if(valid(inputValue)) {
@@ -42,20 +41,20 @@ $(document).ready(function() {
     
 })
 
-// Handle menu tabs 
+// Handle menu tabs
 function openPage(tab) {
     $(".page").hide()
     $("#"+tab+"").show()
     $("#"+tab+"").css("display", "flex")
 }
 
-// Loads once in connect.js 
+// Loads once in connect.js
 async function setup() {
     Geyser = new web3.eth.Contract(abi, GeyserAddress)
     Token = new web3.eth.Contract(token_abi, TokenAddress)
 }
 
-// Load data 
+// Load data
 async function load() {
     try {
         // Update accounting
@@ -149,31 +148,15 @@ async function load() {
 async function deposit() {
     console.log(`Depositing from account: ${accounts[0]}`)
     try {
-        // Get allowance to see how much we have to approve
-        const allowance = await Token.methods.allowance(accounts[0], accounts[0]).send({ from: accounts[0] })
+        const inputValueInWei = web3.utils.toWei($("#v_DEPOSITAMT").val())
+
+        await Token.methods.approve(GeyserAddress, inputValueInWei).send({ from: accounts[0] })
         .on("transactionHash", function(hash) {
-            info("pendingAllowance")
+            info("pendingApproval")
         })
         .on("receipt", function(receipt) {
-            info("allowanceComplete")
+            info("approvalComplete")
         })
-
-        const inputValueInWei = web3.utils.toWei($("#v_DEPOSITAMT").val()),
-              inputValueInWeiFloat = parseFloat(inputValueInWei),
-              allowanceFloat = parseFloat(allowance)
-
-        // If allowance is not enough, we need to call approve
-        if (allowanceFloat < inputValueInWeiFloat) {
-            const diff = inputValueInWei - allowanceFloat
-
-            await Token.methods.approve(GeyserAddress, diff).send({ from: accounts[0] })
-            .on("transactionHash", function(hash) {
-                info("pendingApproval")
-            })
-            .on("receipt", function(receipt) {
-                info("approvalComplete")
-            })
-        }
 
         await Geyser.methods.stake(inputValueInWei).send({ from: accounts[0] })
         .on("transactionHash", function(hash) {
@@ -256,3 +239,5 @@ function decimal(number) {
 function valid(input) {
     return input !== "" && parseFloat(input) > 0
 }
+
+$('.statrow div:first-child').after('<hr class="stat-hr"/>')

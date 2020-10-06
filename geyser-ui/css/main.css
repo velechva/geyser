@@ -30,7 +30,7 @@
 
 #c_WITHDRAW,
 #c_STATS,
-.hidden {
+.is-active {
     display: none;
 }
 
@@ -64,33 +64,8 @@
     background-size: contain;
 }
 
-.tabs {
-    color: #ffffff;
-    border: 0px solid #efefef;
-    display: flex;
-    overflow: hidden;
-    background: #274EEE;
-    height: 45px;
-    width: calc(100% - 10px);
-    border-radius: 10px;
-    margin-bottom: 5px;
-    -webkit-overflow-scrolling: touch;
-}
-
 .content {
     width: calc(100% - 10px);
-}
-
-.tab {
-    width: 33.333333%;
-    cursor: pointer;
-}
-
-.tab-selected {
-    color: #000000;
-    border: 1.5px solid #274EEE;
-    background: #fff;
-    border-radius: 10px;
 }
 
 .b1 {
@@ -114,6 +89,10 @@
     color: #000;
 }
 
+#menu {
+    width: 100%;
+}
+
 .statcol {
     width: 50%;
 }
@@ -123,23 +102,17 @@
     margin: 10px;
 }
 
-
-
-.button {
-    text-transform: uppercase;
-    height: 70px;
-    font-size: 15px;
-    border-radius: 8px;
-    color: white;
-    background: #2096F3;
-    cursor: pointer;
+.stat-hr {
+    margin: 5px 5px 5px 0px;
 }
 
 .disabled {
-    color: rgba(0, 0, 0, 0.26);
-    background-color: rgba(0, 0, 0, 0.12);
     cursor: default;
     pointer-events: none;
+    background-color: white;
+    border-color: #dbdbdb;
+    box-shadow: none;
+    opacity: 0.5;
 }
 
 .input {
@@ -160,4 +133,9 @@
     text-indent: 10px;
     font-weight: bold;
     padding: 12px 10px;
+}
+
+/* Override Bulma */
+.label {
+    display: inherit !important;
 }
