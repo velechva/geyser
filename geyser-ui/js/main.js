@@ -148,7 +148,7 @@ async function load() {
 async function deposit() {
     console.log(`Depositing from account: ${accounts[0]}`)
     try {
-        const inputValueInWei = web3.utils.toWei($("#v_DEPOSITAMT").val())
+        const inputValueInWei = web3.utils.toWei($("#v_DEPOSITAMT").val());
 
         await Token.methods.approve(GeyserAddress, inputValueInWei).send({ from: accounts[0] })
         .on("transactionHash", function(hash) {
@@ -206,6 +206,9 @@ function error(e) {
 // Show info 
 function info(i) {
     switch(i) {
+        case "pendingApproval":
+            $(".e_MESSAGE").text("Pending approval...")
+            break;
         case "pendingDeposit":
             $(".e_MESSAGE").text("Pending deposit...")
         break;

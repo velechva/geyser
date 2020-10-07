@@ -5,7 +5,6 @@
 pragma solidity ^0.6.0;
 
 
-// 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -162,7 +161,6 @@ library SafeMath {
     }
 }
 
-// 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
  */
@@ -237,7 +235,6 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-// 
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -259,7 +256,6 @@ abstract contract Context {
     }
 }
 
-// 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
  * there is an account (an owner) that can be granted exclusive access to
