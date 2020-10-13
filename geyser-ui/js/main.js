@@ -1,6 +1,7 @@
-let Geyser,
-    GeyserAddress = "0xDa318eA78e32D8481bbc1916A3C11339b3d927bE",
-    TokenAddress  = "0x372e79ac44b5d4f4f60b9a47dc8b3eb32bb5119b"
+const GEYSER_ADDRESS = "0xDa318eA78e32D8481bbc1916A3C11339b3d927bE",
+      TOKEN_ADDRESS  = "0x372e79ac44b5d4f4f60b9a47dc8b3eb32bb5119b"
+
+let Geyser
 
 let userTokenBalance,
     totalStakedFor,
@@ -8,7 +9,9 @@ let userTokenBalance,
     callerRewards,
     lockedBalance,
     unlockedBalance,
-    totalBalance
+    totalBalance,
+    estimatedRewards,
+    apy
 
 $(document).ready(function() {
     // Menu clicks
@@ -39,6 +42,17 @@ $(document).ready(function() {
         }
     })
     
+    // Amount to deposit
+    $("#v_DEPOSITAMT").on("input", function(event) {
+        const num = parseFloat(event.target.value)
+        if (isNaN(num)) { return; }
+
+        estimatedRewards = calculateEstimatedRewards(num)
+        refreshLiteral($("#v_ESTREWARDS"), estimatedRewards)
+
+        apy = calculateApy(num)
+        refreshLiteral($("#v_APY"), apy);
+    })
 })
 
 // Handle menu tabs
@@ -50,8 +64,8 @@ function openPage(tab) {
 
 // Loads once in connect.js
 async function setup() {
-    Geyser = new web3.eth.Contract(abi, GeyserAddress)
-    Token = new web3.eth.Contract(token_abi, TokenAddress)
+    Geyser = new web3.eth.Contract(abi, GEYSER_ADDRESS)
+    Token = new web3.eth.Contract(token_abi, TOKEN_ADDRESS)
 }
 
 // Load data
@@ -59,36 +73,33 @@ async function load() {
     try {
         // Update accounting
         await Geyser.methods.updateAccounting().call().then(function(r) {
-            const {
-                n_lockedBalance, 
-                n_unlockedBalance, 
-                n_callerStakingShareSeconds, 
-                n_globalStakingShareSeconds, 
-                n_callerRewards, 
-                n_blockTimestamp
-            } = r
+            const 
+                n_lockedBalance = r[0],
+                n_unlockedBalance = r[1]
+                n_callerStakingShareSeconds = r[2]
+                n_globalStakingShareSeconds = r[3]
+                n_callerRewards = r[4]
+                n_blockTimestamp = r[5]
 
             if (n_callerRewards !== callerRewards) {
                 callerRewards = n_callerRewards
-                refresh($("#v_REWARDS"), callerRewards)
+                refreshWei($("#v_REWARDS"), callerRewards)
             }
-
-            let totalChanged = false;
 
             if (n_lockedBalance !== lockedBalance) {
-                totalChanged = true
                 lockedBalance = n_lockedBalance
-                refresh($("#v_LOCKEDREWARDS"), lockedBalance)
+                refreshWei($("#v_LOCKEDREWARDS"), lockedBalance)
             }
             if (n_unlockedBalance !== unlockedBalance) {
-                totalChanged = true
                 unlockedBalance = n_unlockedBalance
-                refresh($("#v_UNLOCKEDREWARDS"), unlockedBalance)
+                refreshWei($("#v_UNLOCKEDREWARDS"), unlockedBalance)
             }
 
-            if (totalChanged) {
-                totalBalance = lockedBalance + unlockedBalance
-                refresh($("#v_TOTALREWARDS"), totalBalance)
+            n_totalBalance = n_lockedBalance + n_unlockedBalance
+
+            if (n_totalBalance !== totalBalance) {
+                totalBalance = n_totalBalance
+                refreshWei($("#v_TOTALBALANCE"), totalBalance)
             }
         })
 
@@ -96,8 +107,8 @@ async function load() {
         await Token.methods.balanceOf(accounts[0]).call().then(function(r) {
             if(r !== userTokenBalance) {
                 userTokenBalance = r
-                refresh($("#v_WALLETBALANCE"), userTokenBalance) // Balance field 
-                refresh($("#v_DEPOSITAMT"), userTokenBalance) // Input field 
+                refreshWei($("#v_WALLETBALANCE"), userTokenBalance) // Balance field 
+                refreshWei($("#v_DEPOSITAMT"), userTokenBalance) // Input field 
             }
             
             // Remove .disabled class from deposit button when userTokenBalance > 0 
@@ -116,8 +127,8 @@ async function load() {
         await Geyser.methods.totalStakedFor(accounts[0]).call().then(function(r) {
             if(r !== totalStakedFor) {
                 totalStakedFor = r
-                refresh($("#v_DEPOSITEDAMT"), totalStakedFor) // Balance field 
-                refresh($("#v_WITHDRAWAMT"), totalStakedFor) // Input field 
+                refreshWei($("#v_DEPOSITEDAMT"), totalStakedFor) // Balance field 
+                refreshWei($("#v_WITHDRAWAMT"), totalStakedFor) // Input field 
 
                 if (parseFloat(totalStakedFor) > 0) {
                     if ($("#b_WITHDRAW").hasClass("disabled")) {
@@ -135,12 +146,26 @@ async function load() {
         await Geyser.methods.totalStaked().call().then(function(r) {
             if(r !== totalDeposits) {
                 totalDeposits = r
-                refresh($("#s_TOTALDEPOSITS"), totalDeposits) // Total deposits field
+                refreshWei($("#s_TOTALDEPOSITS"), totalDeposits) // Total deposits field
             }
         })
+
+        const tokensClaimedEvents = await Geyser.getPastEvents('TokensClaimed', {
+            filter: { user: accounts[0] },
+            fromBlock: 0,
+            toBlock: 'latest'
+        })
+        const rewards = tokensClaimedEvents
+            .map(x => x.returnValues['amount'])
+            .reduce((a, b) => parseFloat(a) + parseFloat(b), 0)
+        refreshWei($("#v_REWARDS"), rewards.toString())
+
+        rewardMultiplier = calculateRewardMultiplier(parseInt(n_callerStakingShareSeconds));
+        refreshLiteral($("#v_MULTIPLIER"), rewardMultiplier.toString())
     }
     catch(e) {
         console.error(e)
+        error("UnknownError");
     }
 }
 
@@ -150,7 +175,7 @@ async function deposit() {
     try {
         const inputValueInWei = web3.utils.toWei($("#v_DEPOSITAMT").val());
 
-        await Token.methods.approve(GeyserAddress, inputValueInWei).send({ from: accounts[0] })
+        await Token.methods.approve(GEYSER_ADDRESS, inputValueInWei).send({ from: accounts[0] })
         .on("transactionHash", function(hash) {
             info("pendingApproval")
         })
@@ -169,6 +194,7 @@ async function deposit() {
     }
     catch(e) {
         console.error(e)
+        error("Unknown");
     }
 }
 
@@ -184,11 +210,13 @@ async function withdraw() {
         })
         .on("receipt", function(receipt) {
             info("withdrawComplete")
+            refreshWei("#v_AMTCLAIMED", receipt.events.TokensClaimed.returnValues['amount'])
             load() // reload
         })
     }
     catch(e) {
         console.error(e)
+        error("Unknown");
     }
     
 }
@@ -199,6 +227,9 @@ function error(e) {
     switch(e) {
         case "invalidInputValue":
             $(".e_MESSAGE").text("Input value is invalid")
+            break;
+        default:
+            $(".e_MESSAGE").text("Something went wrong. Refresh the page and try again later")
         break;
     }
 }
@@ -225,10 +256,17 @@ function info(i) {
     $(".error").show()
 }
 
-// Update UI with new values 
-function refresh(element, newval) {
+// Update UI with new values after converting newval to wei
+function refreshWei(element, newval) {
     $(element).fadeOut();
     $(element).text(decimal(web3.utils.fromWei(newval)));
+    $(element).fadeIn();
+}
+
+// Update UI with new values 
+function refreshLiteral(element, newval) {
+    $(element).fadeOut();
+    $(element).text(newval);
     $(element).fadeIn();
 }
 

@@ -9,4 +9,3 @@ open "http://localhost:7000"
 # Deploy contracts to ganache
 # cd geyser-api
 # truffle deploy
-

@@ -1,0 +1,268 @@
+pragma solidity ^0.5.10;
+
+
+library SafeMath {
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
+
+        return c;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return sub(a, b, "SafeMath: subtraction overflow");
+    }
+
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        uint256 c = a - b;
+
+        return c;
+    }
+
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
+
+        return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return div(a, b, "SafeMath: division by zero");
+    }
+
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b > 0, errorMessage);
+        uint256 c = a / b;
+
+        return c;
+    }
+
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return mod(a, b, "SafeMath: modulo by zero");
+    }
+
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b != 0, errorMessage);
+        return a % b;
+    }
+}
+
+
+contract ERC20Token {
+    function balanceOf(address owner) public view returns (uint256);
+    function transfer(address to, uint256 value) public returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool);
+}
+
+
+contract iInventory {
+    
+    function getIndividualOwnedCount(
+        uint256 _templateId,
+        address _owner
+    )
+        public 
+        view 
+        returns(uint256);
+        
+    function getTemplateIDsByTokenIDs(
+        uint[] memory _tokenIds
+    )
+        public
+        view
+        returns(uint[] memory);
+    
+    function createFromTemplate(
+        uint256 _templateId,
+        uint8 _feature1,
+        uint8 _feature2,
+        uint8 _feature3,
+        uint8 _feature4,
+        uint8 _equipmentPosition
+    )
+        public
+        returns(uint256);
+
+    function addTreasureChest(uint256 _tokenId, uint256 _rewardsAmount) external;
+    function burn(uint256 _tokenId) public returns(bool);
+
+}
+
+
+contract Generator is iInventory, ERC20Token {
+    
+    using SafeMath for uint256;
+    iInventory public constant inv = iInventory(0xd9145CCE52D386f254917e481eB44e9943F39138);
+    ERC20Token public constant VIDYA = ERC20Token(0x3D3D35bb9bEC23b06Ca00fe472b50E7A4c692C30);
+    
+    // Check if user has dark matter 
+    modifier hasDarkMatter() {
+        require(getIndividualOwnedCount(18, msg.sender) > 0, "Generator: Player does not have any Dark Matter");
+        _;
+    }
+    
+    // Check if the _tokenId is using Dark Matter template (_templateId for Dark Matter is 18)
+    modifier isDarkMatter(uint256 _tokenId) {
+        uint[] memory _arr = new uint[](1);
+        _arr[0] = _tokenId;
+        require(getTemplateIDsByTokenIDs(_arr)[0] == 18, "Generator: Token is not Dark Matter");
+        _;
+    }
+    
+    // Check whether stopTime is set in the future or not 
+    modifier hasFuel() {
+        require(stopTime[msg.sender] >= now, "Generator: Generator has no fuel left");
+        _;
+    }
+    
+    // Check if the generator has been running 
+    modifier hasBeenRunning() {
+        // Require startTime to be in the past and not 0 value 
+        require(startTime[msg.sender] < now && startTime[msg.sender] != 0, "Generator: Generator was started in the future?");
+        _;
+    }
+    
+    // price of 1 Dark Matter = amount of running generators (does this make sense economically/mathemaatically?)
+    uint256 public darkMatterPrice = runningGenerators * 1 ** 18;
+
+    // total amount of VIDYA that has been spent on Dark Matter
+    uint256 public darkMatterBuys;
+    
+    // total amount of VIDYA that has been put into treasure chests 
+    uint256 public totalVidyaInChests;
+    
+    // total amount of currently running generators
+    uint256 public runningGenerators;
+    
+    // player => date when player refueled
+    mapping(address => uint256) public refuelTime;
+    
+    // player => date when generator runs out of dark matter
+    mapping(address => uint256) public stopTime;
+    
+    // player => date when generator was started 
+    mapping(address => uint256) public startTime;
+
+    // Start the generator 
+    function startGenerator()
+        external
+        hasFuel
+    {
+        // Set start time 
+        startTime[msg.sender] = now;
+        
+        // Set stop time 1 week from now 
+        stopTime[msg.sender] = now + 7 days;
+        
+        // Track as running 
+        runningGenerators = runningGenerators.add(1);
+    }
+    
+    // Stop the generator and pay out divs 
+    function stopGenerator()
+        external
+        hasBeenRunning
+    {
+        // Track as not running 
+        runningGenerators = runningGenerators.sub(1);
+        
+        // Create & add reward in the chest 
+        uint256 _tokenId = inv.createFromTemplate(6,0,0,0,0,0); // create new from template id 6
+        inv.addTreasureChest(_tokenId, 100 * 10 ** 18); // add 100 as the reward in vidya
+    }
+    
+    function calculateReward()
+        public
+        view
+        returns(uint256)
+    {
+        // How long has player been staking? 
+        uint256 _duration = stopTime[msg.sender].sub(startTime[msg.sender]);
+        
+        // Max this can return is 604800 ie. seconds in 1 week and that is SUPER low reward given 
+        // the fact we charge more (most likely) for dark matter
+        // please help with algo here...
+        
+        /* Basically we need a simple algo that will take into account all the various market "states" ie:
+        total amount of running generators, dark matter buys, total VIDYA in chests, etc. 
+        
+        and rewards users slightly more than what they spend on dark matter at all times while at the same time 
+        keeping it economically viable still */
+        return _duration;
+    }
+
+    // Add Dark Matter to generator 
+    function refuel(
+        uint256 _tokenId
+    ) 
+        public
+        hasDarkMatter
+        isDarkMatter(_tokenId)
+    {
+        // Burn the Dark Matter token
+        inv.burn(_tokenId);
+        
+        // Set refuel time
+        refuelTime[msg.sender] = now;
+    }
+    
+    // Buy Dark Matter
+    // NB! VIDYA must be approved for transfer at this point 
+    function purchaseDarkMatter() public returns(uint256) {
+        // Check and transfer VIDYA to inventory contract 
+        checkAndTransferVIDYA(darkMatterPrice);
+        
+        // Add to darkMatterBuys tracker 
+        darkMatterBuys = darkMatterBuys.add(darkMatterPrice);
+        
+        // Return the newly minted Dark Matter ERC721 id (18 = _templateId of Dark Matter)
+        return inv.createFromTemplate(18,0,0,0,0,0);
+    }
+    
+    // Check and transfer VIDYA to the inventory contract (for treasure chests)
+    function checkAndTransferVIDYA(uint256 _amount) internal {
+        address inventory = address(0xd9145CCE52D386f254917e481eB44e9943F39138);
+        require(VIDYA.transferFrom(msg.sender, inventory, _amount) == true, "Generator: VIDYA transfer must succeed");
+    }
+
+    function getIndividualOwnedCount(
+        uint256 _templateId,
+        address _owner
+    )
+        public 
+        view 
+        returns(uint256)
+    {
+        return inv.getIndividualOwnedCount(
+            _templateId,
+            _owner
+        );
+    }
+    
+    function getTemplateIDsByTokenIDs(
+        uint[] memory _tokenIds
+    )
+        public
+        view
+        returns(uint[] memory)
+    {
+        return inv.getTemplateIDsByTokenIDs(_tokenIds);
+    }
+    
+    
+    
+    
+    // Empty functions so the whole thing can compile 
+    function createFromTemplate(uint256 _templateId, uint8 _feature1, uint8 _feature2, uint8 _feature3, uint8 _feature4, uint8 _equipmentPosition) public returns(uint256) {}
+    function addTreasureChest( uint256 _tokenId, uint256 _rewardsAmount) external {}
+    function balanceOf(address owner) public view returns (uint256) {}
+    function transfer(address to, uint256 value) public returns (bool) {}
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {}
+    function burn(uint256 _tokenId) public returns(bool) {}
+}

@@ -1,162 +1,159 @@
-/**
- *Submitted for verification at Etherscan.io on 2020-09-15
-*/
-
 pragma solidity ^0.6.0;
 
+pragma experimental ABIEncoderV2;
 
-/**
- * @dev Wrappers over Solidity's arithmetic operations with added overflow
- * checks.
- *
- * Arithmetic operations in Solidity wrap on overflow. This can easily result
- * in bugs, because programmers usually assume that an overflow raises an
- * error, which is the standard behavior in high level programming languages.
- * `SafeMath` restores this intuition by reverting the transaction when an
- * operation overflows.
- *
- * Using this library instead of the unchecked operations eliminates an entire
- * class of bugs, so it's recommended to use it always.
- */
+// /**
+//  * @dev wrappers over solidity's arithmetic operations with added overflow
+//  * checks.
+//  *
+//  * arithmetic operations in solidity wrap on overflow. this can easily result
+//  * in bugs, because programmers usually assume that an overflow raises an
+//  * error, which is the standard behavior in high level programming languages.
+//  * `safemath` restores this intuition by reverting the transaction when an
+//  * operation overflows.
+//  *
+//  * using this library instead of the unchecked operations eliminates an entire
+//  * class of bugs, so it's recommended to use it always.
+//  */
 library SafeMath {
     /**
-     * @dev Returns the addition of two unsigned integers, reverting on
+     * @dev returns the addition of two unsigned integers, reverting on
      * overflow.
      *
-     * Counterpart to Solidity's `+` operator.
+     * counterpart to solidity's `+` operator.
      *
-     * Requirements:
+     * requirements:
      *
-     * - Addition cannot overflow.
+     * - addition cannot overflow.
      */
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
-        require(c >= a, "SafeMath: addition overflow");
+        require(c >= a, "safemath: addition overflow");
 
         return c;
     }
 
     /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * @dev returns the subtraction of two unsigned integers, reverting on
      * overflow (when the result is negative).
      *
-     * Counterpart to Solidity's `-` operator.
+     * counterpart to solidity's `-` operator.
      *
-     * Requirements:
+     * requirements:
      *
-     * - Subtraction cannot overflow.
+     * - subtraction cannot overflow.
      */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return sub(a, b, "SafeMath: subtraction overflow");
+        return sub(a, b, "safemath: subtraction overflow");
     }
 
     /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+     * @dev returns the subtraction of two unsigned integers, reverting with custom message on
      * overflow (when the result is negative).
      *
-     * Counterpart to Solidity's `-` operator.
+     * counterpart to solidity's `-` operator.
      *
-     * Requirements:
+     * requirements:
      *
-     * - Subtraction cannot overflow.
+     * - subtraction cannot overflow.
      */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b <= a, errorMessage);
+    function sub(uint256 a, uint256 b, string memory errormessage) internal pure returns (uint256) {
+        require(b <= a, errormessage);
         uint256 c = a - b;
 
         return c;
     }
 
     /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * @dev returns the multiplication of two unsigned integers, reverting on
      * overflow.
      *
-     * Counterpart to Solidity's `*` operator.
+     * counterpart to solidity's `*` operator.
      *
-     * Requirements:
+     * requirements:
      *
-     * - Multiplication cannot overflow.
+     * - multiplication cannot overflow.
      */
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // gas optimization: this is cheaper than requiring 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
-        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        // see: https://github.com/openzeppelin/openzeppelin-contracts/pull/522
         if (a == 0) {
             return 0;
         }
 
         uint256 c = a * b;
-        require(c / a == b, "SafeMath: multiplication overflow");
+        require(c / a == b, "safemath: multiplication overflow");
 
         return c;
     }
 
     /**
-     * @dev Returns the integer division of two unsigned integers. Reverts on
-     * division by zero. The result is rounded towards zero.
+     * @dev returns the integer division of two unsigned integers. reverts on
+     * division by zero. the result is rounded towards zero.
      *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * counterpart to solidity's `/` operator. note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while solidity
      * uses an invalid opcode to revert (consuming all remaining gas).
      *
-     * Requirements:
+     * requirements:
      *
-     * - The divisor cannot be zero.
+     * - the divisor cannot be zero.
      */
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return div(a, b, "SafeMath: division by zero");
+        return div(a, b, "safemath: division by zero");
     }
 
     /**
-     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-     * division by zero. The result is rounded towards zero.
+     * @dev returns the integer division of two unsigned integers. reverts with custom message on
+     * division by zero. the result is rounded towards zero.
      *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * counterpart to solidity's `/` operator. note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while solidity
      * uses an invalid opcode to revert (consuming all remaining gas).
      *
-     * Requirements:
+     * requirements:
      *
-     * - The divisor cannot be zero.
+     * - the divisor cannot be zero.
      */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b > 0, errorMessage);
+    function div(uint256 a, uint256 b, string memory errormessage) internal pure returns (uint256) {
+        require(b > 0, errormessage);
         uint256 c = a / b;
-        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+        // assert(a == b * c + a % b); // there is no case in which this doesn't hold
 
         return c;
     }
 
     /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts when dividing by zero.
+     * @dev returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverts when dividing by zero.
      *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * counterpart to solidity's `%` operator. this function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while solidity uses an
      * invalid opcode to revert (consuming all remaining gas).
      *
-     * Requirements:
+     * requirements:
      *
-     * - The divisor cannot be zero.
+     * - the divisor cannot be zero.
      */
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return mod(a, b, "SafeMath: modulo by zero");
+        return mod(a, b, "safemath: modulo by zero");
     }
 
     /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts with custom message when dividing by zero.
+     * @dev returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * reverts with custom message when dividing by zero.
      *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * counterpart to solidity's `%` operator. this function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while solidity uses an
      * invalid opcode to revert (consuming all remaining gas).
      *
-     * Requirements:
+     * requirements:
      *
-     * - The divisor cannot be zero.
+     * - the divisor cannot be zero.
      */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b != 0, errorMessage);
+    function mod(uint256 a, uint256 b, string memory errormessage) internal pure returns (uint256) {
+        require(b != 0, errormessage);
         return a % b;
     }
 }
