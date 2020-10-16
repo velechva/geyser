@@ -6,7 +6,7 @@ function calculateRewardMultiplier(stakingSeconds) {
 }
 
 function _estimatedRewards(tokens, seconds) {
-    const totalBalanceFloat = 100000000000 //parseFloat(totalBalance)
+    const totalBalanceFloat = parseFloat(totalBalance)
     if (totalBalanceFloat <= 0) { return 0; }
 
     const unlockBalanceFloat = parseFloat(unlockedBalance)

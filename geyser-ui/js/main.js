@@ -161,7 +161,22 @@ async function load() {
         refreshWei($("#v_REWARDS"), rewards.toString())
 
         rewardMultiplier = calculateRewardMultiplier(parseInt(n_callerStakingShareSeconds));
-        refreshLiteral($("#v_MULTIPLIER"), rewardMultiplier.toString())
+        refreshLiteral($("#v_MULTIPLIER"), rewardMultiplier.toString());
+
+
+        // TODO test when there have been some unlock schedules added
+        Geyser.unlockSchedules().then(function(schedules) {
+            const filteredSchedules = schedules
+                .filter(function(a) { return new Date(a.endTimeSec) > new Date()})
+                .sort(function(a, b) { return new Date(b.endTimeSec) - new Date(a.endTimeSec) });
+            if (filteredSchedules.length > 0) {
+                const nextUnlock = new Date(filteredSchedules[0].endTimeSec)
+                const nextUnlockDays = (nextUnlock - new Date()) / (1000 * 3600 * 24)
+                if (nextUnlockDays > 0) {
+                    refreshLiteral($("#s_DURATION"), nextUnlockDays)
+                }
+            }
+        })
     }
     catch(e) {
         console.error(e)
